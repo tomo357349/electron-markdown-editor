@@ -1,0 +1,166 @@
+/* styles.css */
+
+body, td, li, p, textarea, input pre {
+	font-size: 16px;
+}
+
+body {
+	overflow: hidden;
+}
+
+#content {
+	margin: 0;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	flex-direction: row;
+}
+
+#editor {
+	flex: 1 0 1px;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+
+	font-family: 'Ricty Diminished', 'UD デジタル 教科書体 N-R', sans-serif;
+
+	border: none;
+	padding: .5em;
+	line-height: 1.3;
+	/*white-space: pre-wrap;
+	overflow-y: auto;*/
+}
+#editor:active, 
+#editor:focus, 
+#editor:focus-visible {
+	outline: none;
+}
+#editor.flaged {
+	display: none;
+}
+
+#editor .ql-toolbar {
+	display: none;
+}
+
+#editor-quill {
+	flex: 1 0 1px;
+
+	height: auto;
+	overflow-y: auto;
+}
+
+#viewer {
+	/*grid-column: 2;*/
+	flex: 1 0 1px;
+	margin: 0;
+	padding: 0;
+	border-left: #ccc solid 1px;
+	overflow-y: auto;
+
+	padding: .5em;
+}
+#viewer.flaged {
+	display: none;
+}
+
+.toast-backdrop {
+	position: fixed;
+	right: 0;
+	bottom: .5em;
+	text-align: right;
+	z-index: 100;
+}
+.toast {
+	background-color: #666;
+	color: #fff;
+	word-break: break-all;
+	width: 250px;
+	overflow: hidden;
+	text-align: left;
+	border-top: #666 solid 0;
+	border-right: #666 solid .5em;
+	border-bottom: #666 solid 0;
+	border-left: #666 solid .5em;
+	margin: .5em;
+	border-radius: .5em;
+	position: relative;
+	top: 5em;
+}
+.toast.error {
+	background-color: #966;
+	border-color: #966;
+}
+.toast.pop {
+	transition-duration: 0.8s;
+	border-top-width: .5em;
+	border-bottom-width: .5em;
+	top: 0;
+}
+
+.toast-header {
+	font-size: 60%;
+	color: #ccc;
+}
+
+@media screen {
+	body.dark {
+		background-color: #000;
+		color: #fff;
+	}
+
+	body.dark #editor {
+		background-color: #000;
+		color: #fff;
+	}
+
+	body.dark #viewer {
+		border-left: #333 solid 1px;
+	}
+
+	body.dark .toast {
+		background-color: #999;
+		color: #000;
+		border-color: #999;
+	}
+
+	body.dark .toast.error {
+		background-color: #c99;
+		border-color: #c99;
+	}
+
+	body.dark .toast-header {
+		color: #333;
+	}
+}
+
+@media print {
+	body {
+		-webkit-print-color-adjust: exact;
+	}
+
+	body.dark {
+		background-color: #fff;
+		color: #000;
+	}
+
+	#editor {
+		display: none;
+	}
+
+	#viewer {
+		border-left: transparent solid 1px;
+	}
+
+	#viewer.flaged {
+		display: block;
+	}
+
+	.toast-backdrop {
+		display: none;
+	}
+}
