@@ -1,8 +1,6 @@
-// Modules to control application life and create native browser window
 const {app, dialog, nativeTheme, ipcMain, BrowserWindow, Menu} = require('electron');
 const fs = require('fs');
 const path = require('path');
-// const isDev = process.env.NODE_ENV === 'development';
 
 /** @type {boolean} */
 const isMac = process.platform === 'darwin';
@@ -10,11 +8,6 @@ const isMac = process.platform === 'darwin';
 let mainWindow;
 
 function createWindow () {
-  // const svgA = path.join(process.resourcesPath, 'lib/a.svg');
-  // const flg = fs.existsSync(svgA);
-  // console.log('exists', flg);
-
-  // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -177,6 +170,7 @@ const template = [
           },
           {
             label: 'Hide Viewer',
+            accelerator: 'CmdOrCtrl+J',
             type: 'checkbox',
             click: hideViewer
           }
@@ -220,7 +214,11 @@ const menus = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menus);
 
 function showAbout() {
-  // TODO:
+  dialog.showMessageBox(mainWindow, {
+    message: 'Markdown Editor\nThe MIT License (MIT)\nCopyright © 2021 Tomoaki Takahashi',
+    type: 'none',
+    title: 'Markdown Editor',
+  });
 }
 
 let currentFilePath = null;
@@ -317,7 +315,25 @@ function printDocument() {
 }
 
 function exportHtml() {
-  // TODO: 
+  dialog.showSaveDialog(mainWindow, {
+    buttonLavel: 'Export',
+    filters: [
+      {
+        extensions: ['html', 'xml']
+      }
+    ],
+    properties: [
+      'createDirectory'
+    ]
+  }).then((data) => {
+    if (!data || data.canceled) return;
+
+    data.filePath;
+    mainWindow.webContents.send('export-html', {
+      path: data.filePath,
+      name: path.basename(data.filePath),
+    });
+  });
 }
 
 ipcMain.on('file-save', (evt, data) => {

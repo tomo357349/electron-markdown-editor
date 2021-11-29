@@ -2,45 +2,16 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
     <title>Markdown Editor</title>
-
-    <!-- <link href="./lib/quill/quill.core.css" rel="stylesheet">-->
-    <!-- <link href="./lib/quill/quill.snow.css" rel="stylesheet">-->
-    <link href="./lib/highlight/styles/github-dark.min.css" rel="stylesheet">
     <link href="./styles.css" rel="stylesheet">
-
-    <script src="./lib/marked/marked.js"></script>
-    <script src="./lib/highlight/highlight.js"></script>
-    <script src="./lib/highlight/languages/c.min.js"></script>
-    <script src="./lib/highlight/languages/csharp.min.js"></script>
-    <script src="./lib/highlight/languages/css.min.js"></script>
-    <script src="./lib/highlight/languages/java.min.js"></script>
-    <script src="./lib/highlight/languages/javascript.min.js"></script>
-    <script src="./lib/highlight/languages/sql.min.js"></script>
-    <script src="./lib/highlight/languages/xml.min.js"></script>
-    <!--<script src="./lib/quill/quill.js"></script>-->
   </head>
   <body>
-    <!--
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
-    -->
-
     <div id="content">
-      <!--<pre id="editor" contenteditable="true"></pre>-->
       <textarea id="editor"></textarea>
-      <!--<div id="editor">
-        <pre><code id="editor-contents" contenteditable="true" class="language-javascript">function xxx() {var x =0;}</code></pre>
-      </div>-->
       <div id="viewer"></div>
     </div>
     <div class="toast-backdrop"></div>
-
-    <!-- You can also require other files to run in this process -->
     <script src="./renderer.js"></script>
   </body>
 </html>

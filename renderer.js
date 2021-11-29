@@ -1,11 +1,19 @@
-// This file is required by the index.html file and will
-// be executed in the renderer process for that window.
-// No Node.js APIs are available in this process because
-// `nodeIntegration` is turned off. Use `preload.js` to
-// selectively enable features needed in the rendering
-// process.
 const editor = document.querySelector('#editor');
-// const editor = document.querySelector('#editor-contents');
+const viewer = document.querySelector('#viewer');
+
+setTimeout(() => {
+	if (editor) editor.focus();
+}, 100);
+
+(function() {
+	if (!window.api.viewcss) return;
+	var link = document.createElement('link');
+	link.href = window.api.viewcss;
+	console.log(link.href, window.api.viewstyle);
+	link.rel = 'stylesheet';
+	link.type = 'text/css';
+	document.getElementsByTagName('head')[0].appendChild(link);
+})();
 
 window.api.send("toMain", "some data");
 
@@ -33,6 +41,14 @@ window.api.receive('save-file', (data) => {
 	});
 });
 
+window.api.receive('export-html', (data) => {
+	const html = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>' + data.name + '</title><style>' + (window.api.highlightstyle || '') + '\n' + (window.api.viewstyle || '') + '</style></head><body id="viewer">' + viewer.innerHTML + '</body></html>';
+	window.api.send('file-save', {
+		path: data.path,
+		name: data.name,
+		contents: html
+	});
+})
 window.api.receive('show-toast', (data) => {
 	addToast(data);
 });
@@ -46,18 +62,16 @@ window.api.receive('toggle-renderer', (data) => {
 	document.querySelector('#' + data.target).classList[data.toggle ? 'add' : 'remove']('flaged');
 });
 
-let markedhtml;
 function refleshViewer(txt, reset) {
-	markedhtml = marked(txt, {
+	const markedhtml = window.api.marked(txt, {
 		toc: false, 
 		todo: false
 	});
 
-	const viewer = document.querySelector('#viewer');
 	const lastScrollTop = viewer.scrollTop;
 	viewer.innerHTML = markedhtml;
 
-	hljs.highlightAll();
+	window.api.hljs.highlightAll();
 	// document.querySelectorAll('pre code').forEach((el) => {
 	// 	hljs.highlightElement(el);
 	// });
@@ -80,23 +94,12 @@ function refleshViewer(txt, reset) {
 	// }, 500);
 }
 
-// const quill = new Quill('#editor-quill', {
-// 	modules: {
-// 		syntax: true,
-// 		toolbar: [ ]
-// 	},
-// 	theme: 'snow' // or bubble
-// });
-
 let waitChangeHndl;
 editor.addEventListener('keyup', () => {
-// quill.on('text-change', (delta, old, src) => {
  	if (waitChangeHndl) clearTimeout(waitChangeHndl);
 
 	waitChangeHndl = setTimeout(() => {
 		const txt = editor.value;
-		// const txt = editor.innerHTML;
-		// const txt = quill.getText();
 		refleshViewer(txt || '');
 	}, 1500);
 });
