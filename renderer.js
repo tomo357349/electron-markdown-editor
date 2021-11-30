@@ -24,7 +24,7 @@ window.api.receive('log', (data) => {
 window.api.receive('open-file', (data) => {
 	console.log(`Received open-file:${data.path} from main process`);
 	document.title = data.name +' - Markdown Editor';
-	document.querySelector('#editor').innerHTML = data.contents;
+	editor.innerHTML = data.contents;
 	refleshViewer(data.contents, true);
 
 	addToast({
