@@ -1,8 +1,10 @@
+const fs = require('fs');
 const path = require('path');
 const { app, contextBridge, ipcRenderer } = require('electron');
 const { marked } = require('marked');
 const hljs = require('highlight.js/lib/common');
-const fs = require('fs');
+const katex = require('katex');
+// const d3 = require('d3');
 
 let viewcss = null;
 let viewstyle = null;
@@ -34,6 +36,8 @@ contextBridge.exposeInMainWorld(
   'api', {
     marked: marked,
     hljs: hljs,
+    katex: katex,
+    // d3: d3,
     viewcss: viewcss,
     viewstyle: viewstyle,
     highlightstyle: highlightstyle,

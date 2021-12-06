@@ -1,5 +1,6 @@
 /* styles.css */
 @import './node_modules/highlight.js/styles/dark.css';
+@import './node_modules/katex/dist/katex.css';
 
 body, td, li, p, textarea, input pre {
 	font-size: 16px;
