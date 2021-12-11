@@ -47,6 +47,11 @@ builder.build({
 				target: 'zip',
 				arch: ['x64']
 			}
+		},
+		mac: {
+			target: {
+				target: 'default'
+			}
 		}
 	}
-})
+});
