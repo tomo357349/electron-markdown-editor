@@ -111,9 +111,46 @@
 	min-width: 12%;
 }
 
+.d3tree-link {
+	fill: none;
+	stroke: #666;
+}
+.d3tree-node rect {
+	fill: none;
+	stroke: #000;
+}
+.d3tree-node.mark rect {
+	fill: rgba(255, 189, 189, .5);
+	stroke: #600;
+}
+.d3tree-node text {
+	fill: #000;
+	font-family: "Ricty Diminished", Ricty, Consolas, "Courier New", Courier, Monaco, monospace;
+}
+.d3tree-node.mark text {
+	fill: #600;
+}
+
 @media screen {
 	.dark #viewer {
 
+	}
+
+	.dark .d3tree-link {
+		stroke: #999;
+	}
+	.dark .d3tree-node rect {
+		stroke: #ccc;
+	}
+	.dark .d3tree-node text {
+		fill: #ccc;
+	}
+	.d3tree-node.mark rect {
+		fill: rgba(255, 189, 189, .3);
+		stroke: #f33;
+	}
+	.dark .d3tree-node.mark text {
+		fill: #f33;
 	}
 }
 

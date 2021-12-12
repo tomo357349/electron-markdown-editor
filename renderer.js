@@ -66,6 +66,11 @@ window.api.receive('toggle-renderer', (data) => {
 	document.querySelector('#' + data.target).classList[data.toggle ? 'add' : 'remove']('flaged');
 });
 
+window.api.receive('load-examples', (data) => {
+	editor.value = examples();
+	refleshViewer(examples(), true);
+});
+
 function refleshViewer(txt, reset) {
 	const markedhtml = marked(txt, {
 		toc: false,
@@ -117,6 +122,15 @@ function refleshViewer(txt, reset) {
 ```
 			*/
 			chart(pre, JSON.parse(el.innerText));
+		} catch (err) {
+			console.error(err);
+		}
+	});
+
+	document.querySelectorAll('pre code.language-tree').forEach((el) => {
+		try {
+			const pre = el.parentElement;
+			drawTree(pre, JSON.parse(el.innerText));
 		} catch (err) {
 			console.error(err);
 		}
@@ -276,4 +290,215 @@ function chart(el, opts) {
 	// add the y Axis
 	svg.append('g')
 		.call(d3.axisLeft(y));
+}
+
+
+function drawTree(el, json) {
+	json = json || {};
+	let data = json.data || [];
+	let opts = json.opts || {};
+	opts.rect = opts.rect || {
+		w: 80,
+		h: 20
+	};
+	opts.space = opts.space || {
+		pad: 20,
+		w: 100,
+		h: 30
+	};
+	/* opts
+	{
+		raw: true,
+		w: 0,
+		h: 0,
+		rect: {
+			w: 80,
+			h: 20
+		},
+		space: {
+			pad: 20,
+			w: 100,
+			h: 30
+		}
+	}*/
+
+	/* data
+	{
+		"(root)": {
+			"opt": {},
+			"usr": {
+				"bin": {},
+				"lib@mark": {
+					"cron": {},
+					"zsh": {}
+				},
+				"local": {
+					"bin": {}
+				},
+				"sbin": {}
+			}
+		}
+	};*/
+
+	/*
+	var data = {
+		name: "(root)",
+		children: [
+			{
+				name: "opt"
+			},
+			{
+				name: "usr",
+				children: [
+					{
+						name: "bin"
+					},
+					{
+						name: "lib",
+						class: "mark",
+						children: [
+							{ name: "cron" }, { name: "zsh" }
+						]
+					},
+					{
+						name: "local",
+						children: [
+							{ name: "bin" }
+						]
+					},
+					{
+						name: "sbin"
+					},
+				],
+			}
+		]
+	};*/
+
+	const svg = d3.select(el.parentNode).append('svg');
+		// .append('g')
+		// .attr('transform', 'translate(' + opts.margin.left + ',' + opts.margin.top + ')');
+	el.parentNode.replaceChild(svg.node(), el);
+
+	if (!opts.raw) data = convertRawData(data)[0];
+
+	var root = d3.hierarchy(data);
+	var tree = d3.tree();
+	tree(root);
+	root.count();
+
+	var height = opts.h || (root.value * opts.rect.h +
+		(root.value - 1) * (opts.space.h - opts.rect.h) +
+		opts.space.pad * 2);
+	var width = opts.w || ((root.height + 1) * opts.rect.w +
+		root.height * (opts.space.w - opts.rect.w) +
+		opts.space.pad * 2);
+
+	svg.attr('width', width).attr('height', height);
+
+	function convertRawData(raw) {
+		if (!raw) return;
+
+		return Object.keys(raw).map(function (k) {
+			var token = k.split('@');
+			var o = {
+				name: token[0],
+				class: token[1]
+			};
+			var children = convertRawData(raw[k]);
+			if (children && children.length) o.children = children;
+			return o;
+		});
+	}
+
+	function seekParent(d, name) {
+		var siblings = d.parent.children;
+		var target = siblings.find(function (d) {
+			return d.data.name == name;
+		});
+		return target ? { name: name, hierarchy: siblings } : seekParent(d.parent, name);
+	}
+
+	function calcLeaves(names, d) {
+		var eachHierarchies = names.map(function (name) {
+			return seekParent(d, name)
+		});
+		var eachIdxes = eachHierarchies.map(function (item) {
+			return item.hierarchy.findIndex(function (contents) {
+				return contents.data.name == item.name;
+			});
+		});
+		var filteredHierarchies = eachHierarchies.map(function (item, idx) {
+			return item.hierarchy.slice(0, eachIdxes[idx]);
+		});
+		var values = filteredHierarchies.map(function (hierarchy) {
+			return hierarchy.map(function (item) {
+				return item.value;
+			});
+		});
+		return values.flat();
+	}
+
+	function defineY(data, spc) {
+		const ancestorValues = data.ancestors().map(function (item) {
+			return item.data.name;
+		});
+		const leaves = calcLeaves(ancestorValues.slice(0, ancestorValues.length - 1), data);
+		const sumLeaves = leaves.reduce(function (previous, current) {
+			return previous + current;
+		}, 0);
+		return sumLeaves * spc.h + spc.pad;
+	}
+
+	function definePos(treeData, spc) {
+		treeData.each(function (d) {
+			d.x = d.depth * spc.w + spc.pad;
+			d.y = defineY(d, spc);
+		});
+	}
+
+	definePos(root, opts.space);
+
+	var g = svg.append('g');
+
+	g.selectAll('.d3tree-link')
+		.data(root.descendants().slice(1))
+		.enter()
+		.append('path')
+		.attr('class', 'd3tree-link')
+		.attr('d', function (d) {
+			var p = 'M' + d.x + ',' + d.y + 'L' + (d.parent.x + opts.rect.w + (opts.space.w - opts.rect.w) / 2) + ',' + (d.y) + ' ' + (d.parent.x + opts.rect.w + (opts.space.w - opts.rect.w) / 2) + ',' + (d.parent.y) + ' ' + (d.parent.x + opts.rect.w) + ',' + d.parent.y;
+			return p;
+			//	.replace(/\r?\n/g, '')
+			//	.replace(/\s+/g, ' ');
+		})
+		.attr('transform', function (d) {
+			return 'translate(0, ' + (opts.rect.h / 2) + ')';
+		});
+
+	g.selectAll('.d3tree-node')
+		.data(root.descendants())
+		.enter()
+		.append('g')
+		.attr('class', function (d) {
+			return (d.data.class ? d.data.class + ' ' : '') + 'd3tree-node';
+		})
+		.attr('transform', function (d) {
+			return 'translate(' + d.x + ', ' + d.y + ')';
+		})
+		.call(function (me) {
+			me.append('rect')
+				.attr('width', opts.rect.w)
+				.attr('height', opts.rect.h);
+		})
+		.call(function (me) {
+			me.append('text')
+				.text(function (d) {
+					return d.data.name;
+				})
+				.attr('transform', 'translate(5, 15)');
+		});
+}
+
+function examples() {
+	return '# Head 1\n## Head 2\n### Head 3\n#### Head 4\nLorem _ipsum_ __dolor__ ~~sit~~ **amet**, [consectetur](https://www.google.com) adipiscing elit, do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n#This is not the header.\n\n# Lists\n* unordered list item 1\n* item 2\n* item3\n\n1. ordered list item 1\n2. item 2\n3. item 3\n\n# Table\n|number|text|date|\n|--:|---|:-:|\n|1|aaa|21-1-1|\n|10|bb|2021-10-10|\n\n# Blockquote\nLorem ipsum dolor sit amet\n\n> Lorem ipsum dolor sit amet, consectetur adipiscing elit, do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nconsectetur adipiscing elit, do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\n# Code\n\n```js\nvar x = 10;\nconsole.log(x);\n```\n\n```html\n<html>\n    <body class="sample">aaa</body>\n</html>\n```\n```css\nbody {\n  font-size: 16px;\n}\n\n.warn {\n  color: #f00;\n}\n```\n\n# Math\n```tex\n\\sum_{i=1}^{n} x_i\\\\\ny=2^x\n```\n\n```tex\nc = \\pm\\sqrt{a^2 + b^2}\n```\n\n# Charts\n\n```chart\n{\n  "type": "bar",\n  "width": 0,\n  "height": 0,\n  "margin": {\n    "left": 20,\n    "bottom": 20\n  },\n  "data": [\n    { "id": "item 1", "value": 10 },\n    { "id": "item 2", "value": 8 },\n    { "id": "item 3", "value": 13 }\n  ]\n}\n```\n\n```chart\n{\n  "type": "line",\n  "width": 0,\n  "height": 0,\n  "margin": {\n    "left": 20,\n    "bottom": 20\n  },\n  "scale": {\n    "x": "linear"\n  },\n  "data": [\n    { "id": 1, "value": 5 },\n    { "id": 5, "value": 8 },\n    { "id": 6, "value": 3 }\n  ]\n}\n```\n\n```tree\n{\n  "opts": {\n    "space": {\n      "pad": 20,\n      "w": 100,\n      "h": 30\n    },\n    "rect": {\n      "w": 80,\n      "h": 20\n    }\n  },\n  "data": {\n    "(root)": {\n      "opt": {},\n      "usr": {\n        "bin": {},\n        "lib@mark": {\n          "cron": {},\n          "zsh": {}\n        },\n        "local": {\n          "bin": {}\n        },\n        "sbin": {}\n      }\n    }\n     }\n}\n```\n\n';
 }

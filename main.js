@@ -204,6 +204,11 @@ const template = [
     role: 'help',
     submenu: [
       {
+        label: 'Load Examples',
+        click: loadExamples
+      },
+      { type: 'separator' },
+      {
         label: 'About',
         click: showAbout
       }
@@ -212,6 +217,10 @@ const template = [
 ];
 const menus = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menus);
+
+function loadExamples() {
+  mainWindow.webContents.send('load-examples', {});
+}
 
 function showAbout() {
   dialog.showMessageBox(mainWindow, {

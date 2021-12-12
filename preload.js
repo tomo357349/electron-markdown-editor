@@ -50,7 +50,7 @@ contextBridge.exposeInMainWorld(
       }
     },
     receive: (channel, func) => {
-      let validChannels = ['log', 'open-file', 'export-html', 'change-theme', 'save-file', 'toggle-renderer', 'show-toast'];
+      let validChannels = ['log', 'open-file', 'export-html', 'change-theme', 'save-file', 'toggle-renderer', 'show-toast', 'load-examples'];
       if (validChannels.includes(channel)) {
         ipcRenderer.on(channel, (event, ...args) => func(...args));
       } else {
