@@ -345,6 +345,13 @@ function exportHtml() {
   });
 }
 
+ipcMain.on('theme-change', (evt, data) => {
+  console.log('theme=' + data);
+
+  currentTheme = (data === 'dark') ? 'light' : 'dark';
+  darkMode();
+});
+
 ipcMain.on('file-save', (evt, data) => {
   console.log('path=' + data.path);
   fs.writeFileSync(data.path, data.contents);

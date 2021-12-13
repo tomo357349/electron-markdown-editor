@@ -5,9 +5,38 @@ const marked = window.api.marked;
 const katex = window.api.katex;
 // const d3 = window.api.d3;
 
+const ace1 = ace.edit('editor');
+ace1.setTheme('ace/theme/chrome'); // monokai xcode one_dark github eclipse
+ace1.setOption('wrap', true);
+ace1.setOption('wrapBehavioursEnabled', true);
+ace1.setOption('wrapMethod', 'text');
+ace1.setOption('indentedSoftWrap', false);
+ace1.session.setMode('ace/mode/markdown');
+
 setTimeout(() => {
-	if (editor) editor.focus();
+	//	if (editor) editor.focus();
+	ace1.focus();
 }, 100);
+
+(function () {
+	if (!window.api.highlightcss) return;
+	var link = document.createElement('link');
+	link.href = window.api.highlightcss;
+	console.log(link.href);
+	link.rel = 'stylesheet';
+	link.type = 'text/css';
+	document.getElementsByTagName('head')[0].appendChild(link);
+})();
+
+(function () {
+	if (!window.api.katexcss) return;
+	var link = document.createElement('link');
+	link.href = window.api.katexcss;
+	console.log(link.href);
+	link.rel = 'stylesheet';
+	link.type = 'text/css';
+	document.getElementsByTagName('head')[0].appendChild(link);
+})();
 
 (function () {
 	if (!window.api.viewcss) return;
@@ -19,8 +48,6 @@ setTimeout(() => {
 	document.getElementsByTagName('head')[0].appendChild(link);
 })();
 
-window.api.send("toMain", "some data");
-
 window.api.receive('log', (data) => {
 	console.log(`Received log:${data} from main process`);
 });
@@ -28,7 +55,8 @@ window.api.receive('log', (data) => {
 window.api.receive('open-file', (data) => {
 	console.log(`Received open-file:${data.path} from main process`);
 	document.title = data.name + ' - Markdown Editor';
-	editor.innerHTML = data.contents;
+	// editor.value = data.contents;
+	ace1.setValue(data.contents);
 	refleshViewer(data.contents, true);
 
 	addToast({
@@ -37,7 +65,8 @@ window.api.receive('open-file', (data) => {
 });
 
 window.api.receive('save-file', (data) => {
-	const txt = editor.value;
+	// const txt = editor.value;
+	const txt = ace1.getText();
 	window.api.send('file-save', {
 		path: data.path,
 		name: data.name,
@@ -46,7 +75,7 @@ window.api.receive('save-file', (data) => {
 });
 
 window.api.receive('export-html', (data) => {
-	const html = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>' + data.name + '</title><style>' + (window.api.highlightstyle || '') + '\n' + (window.api.viewstyle || '') + '</style></head><body id="viewer">' + viewer.innerHTML + '</body></html>';
+	const html = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>' + data.name + '</title><style>' + (window.api.highlightstyle || '') + '\n' + (window.api.katexstyle || '') + '\n' + (window.api.viewstyle || '') + '</style></head><body id="viewer">' + viewer.innerHTML + '</body></html>';
 	window.api.send('file-save', {
 		path: data.path,
 		name: data.name,
@@ -57,19 +86,35 @@ window.api.receive('show-toast', (data) => {
 	addToast(data);
 });
 
-window.api.receive('change-theme', (data) => {
-	console.log(`Received change-theme:${data} from main process`);
-	document.body.classList[data === 'dark' ? 'add' : 'remove']('dark');
-});
+window.api.receive('change-theme', changeTheme);
 
 window.api.receive('toggle-renderer', (data) => {
 	document.querySelector('#' + data.target).classList[data.toggle ? 'add' : 'remove']('flaged');
 });
 
 window.api.receive('load-examples', (data) => {
-	editor.value = examples();
+	// editor.value = examples();
+	ace1.setValue(examples());
 	refleshViewer(examples(), true);
 });
+
+let waitChangeHndl;
+// editor.addEventListener('keyup', () => {
+ace1.session.on('change', (delta) => {
+		if (waitChangeHndl) clearTimeout(waitChangeHndl);
+
+	waitChangeHndl = setTimeout(() => {
+		// const txt = editor.value;
+		const txt = ace1.getValue();
+		refleshViewer(txt || '');
+	}, 1500);
+});
+
+setTimeout(() => {
+	if (window.api.config.mode === 'dark') {
+		window.api.send('theme-change', window.api.config.mode);
+	}
+}, 500);
 
 function refleshViewer(txt, reset) {
 	const markedhtml = marked(txt, {
@@ -90,6 +135,7 @@ function refleshViewer(txt, reset) {
 */
 			pre.innerHTML = katex.renderToString(el.innerText, {
 				displayMode: true,
+				strict: false,
 				throwOnError: false
 			});
 		} catch (err) {
@@ -159,15 +205,11 @@ function refleshViewer(txt, reset) {
 	// }, 500);
 }
 
-let waitChangeHndl;
-editor.addEventListener('keyup', () => {
-	if (waitChangeHndl) clearTimeout(waitChangeHndl);
-
-	waitChangeHndl = setTimeout(() => {
-		const txt = editor.value;
-		refleshViewer(txt || '');
-	}, 1500);
-});
+function changeTheme(data) {
+	console.log(`Received change-theme:${data} from main process`);
+	document.body.classList[data === 'dark' ? 'add' : 'remove']('dark');
+	ace1.setTheme(data === 'dark' ? 'ace/theme/monokai' : 'ace/theme/chrome');
+}
 
 function addToast(data) {
 	if (!data || !data.message) return;

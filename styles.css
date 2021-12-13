@@ -1,10 +1,4 @@
 /* styles.css */
-@import './node_modules/highlight.js/styles/dark.css';
-@import './node_modules/katex/dist/katex.css';
-
-body, td, li, p, textarea, input pre {
-	font-size: 16px;
-}
 
 body {
 	overflow: hidden;
@@ -28,6 +22,7 @@ body {
 	display: flex;
 	flex-direction: column;
 
+	font-size: 16px;
 	font-family: 'Ricty Diminished', 'UD デジタル 教科書体 N-R', sans-serif;
 
 	border: none;
@@ -70,14 +65,14 @@ body {
 	display: none;
 }
 
-.toast-backdrop {
+#toast .toast-backdrop {
 	position: fixed;
 	right: 0;
 	bottom: .5em;
 	text-align: right;
 	z-index: 100;
 }
-.toast {
+#toast .toast {
 	background-color: #666;
 	color: #fff;
 	word-break: break-all;
@@ -93,20 +88,42 @@ body {
 	position: relative;
 	top: 5em;
 }
-.toast.error {
+#toast .toast.error {
 	background-color: #966;
 	border-color: #966;
 }
-.toast.pop {
+#toast .toast.pop {
 	transition-duration: 0.8s;
 	border-top-width: .5em;
 	border-bottom-width: .5em;
 	top: 0;
 }
 
-.toast-header {
+#toast .toast-header {
 	font-size: 60%;
 	color: #ccc;
+}
+
+#editor .ace_scrollbar::-webkit-scrollbar, 
+#viewer::-webkit-scrollbar {
+	width: 20px;
+}
+#editor .ace_scrollbar::-webkit-scrollbar-corner, 
+#viewer::-webkit-scrollbar-corner {
+	background: rgba(255,255,255,.5);
+}
+#editor .ace_scrollbar::-webkit-scrollbar-thumb, 
+#viewer::-webkit-scrollbar-thumb {
+	background-color: #ccc;
+	border-radius: 6px;
+	border: 4px solid rgba(255,255,255,.5);
+	background-clip: content-box;
+	min-width: 32px;
+	min-height: 32px;
+}
+#editor .ace_scrollbar::-webkit-scrollbar-track, 
+#viewer::-webkit-scrollbar-track {
+	background-color: rgba(255,255,255,.5);
 }
 
 @media screen {
@@ -115,27 +132,45 @@ body {
 		color: #fff;
 	}
 
-	body.dark #editor {
+	body.dark #editor .ace_scrollbar::-webkit-scrollbar-corner, 
+	body.dark #viewer::-webkit-scrollbar-corner {
+		background: rgba(0,0,0,.5);
+	}
+	body.dark #editor .ace_scrollbar::-webkit-scrollbar-thumb, 
+	body.dark #viewer::-webkit-scrollbar-thumb {
+		background-color: #666;
+		border-radius: 6px;
+		border: 4px solid rgba(0,0,0,.5);
+		background-clip: content-box;
+		min-width: 32px;
+		min-height: 32px;
+	}
+	body.dark #editor .ace_scrollbar::-webkit-scrollbar-track, 
+	body.dark #viewer::-webkit-scrollbar-track {
+		background-color: rgba(0,0,0,.5);
+	}
+
+	/*body.dark #editor {
 		background-color: #000;
 		color: #fff;
-	}
+	}*/
 
 	body.dark #viewer {
 		border-left: #333 solid 1px;
 	}
 
-	body.dark .toast {
+	body.dark #toast .toast {
 		background-color: #999;
 		color: #000;
 		border-color: #999;
 	}
 
-	body.dark .toast.error {
+	body.dark #toast .toast.error {
 		background-color: #c99;
 		border-color: #c99;
 	}
 
-	body.dark .toast-header {
+	body.dark #toast .toast-header {
 		color: #333;
 	}
 }
@@ -162,7 +197,7 @@ body {
 		display: block;
 	}
 
-	.toast-backdrop {
+	#toast.toast-backdrop {
 		display: none;
 	}
 }

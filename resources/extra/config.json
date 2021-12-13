@@ -1,0 +1,5 @@
+{
+	"mode": "light",
+	"highlightcss": "./node_modules/highlight.js/styles/github.css",
+	"katexcss": "./node_modules/katex/dist/katex.css"
+}
