@@ -1,5 +1,6 @@
 const editor = document.querySelector('#editor');
 const viewer = document.querySelector('#viewer');
+const popup = document.querySelector('#drop');
 
 const marked = window.api.marked;
 const katex = window.api.katex;
@@ -54,6 +55,10 @@ window.api.receive('log', (data) => {
 
 window.api.receive('open-file', (data) => {
 	console.log(`Received open-file:${data.path} from main process`);
+	Object.keys(loadedimages).slice().forEach((k) => {
+		delete loadedimages[k];
+	});
+	clearPopup();
 	document.title = data.name + ' - Markdown Editor';
 	// editor.value = data.contents;
 	ace1.setValue(data.contents);
@@ -92,6 +97,114 @@ window.api.receive('toggle-renderer', (data) => {
 	document.querySelector('#' + data.target).classList[data.toggle ? 'add' : 'remove']('flaged');
 });
 
+const loadedimages = {};
+window.api.receive('load-images', (data) => {
+	const imgtags = [];
+	data.files.forEach((f) => {
+		imgtags.push('<img id="' + f.name + '">');
+		toBase64Url(f.contents, (url) => {
+			if (loadedimages[f.name]) {
+				addToast({
+					type: 'warn',
+					message: 'overwrite: ' + f.name
+				});
+			} else {
+				addToast({
+					message: 'load: ' + f.name
+				});
+			}
+			loadedimages[f.name] = url;
+			if (imgtags.length === data.files.length) {
+				const txt = ace1.getValue();
+				refleshViewer(txt || '');
+			}
+		});
+	});
+	if (data.generateTag) {
+		const pos = ace1.getCursorPosition();
+		ace1.session.insert(pos, imgtags.join('\n'));
+	}
+
+	function toBase64Url(uint8arr, callback) {
+		const reader = new FileReader()
+		reader.onload = (() => {
+			if (callback) callback(reader.result);
+		});
+		reader.readAsDataURL(new Blob([uint8arr]))
+	}
+});
+
+window.api.receive('list-images', () => {
+	clearPopup();
+	popup.classList.remove('hidden');
+	const tmpdict = {};
+	document.querySelectorAll('img').forEach((el) => {
+		if (!el.id) return;
+		if (!loadedimages[el.id]) return;
+
+		tmpdict[el.id] = { html: true };
+	});
+	Object.keys(loadedimages).forEach((k) => {
+		tmpdict[k] = tmpdict[k] || {};
+		tmpdict[k].load = loadedimages[k];
+	});
+	const sortedkeys = Object.keys(tmpdict).sort((a, b) => {
+		if (a > b) return 1;
+		else if (a < b) return -1;
+		else return 0;
+	});
+
+	const closebtn = document.createElement('div');
+	closebtn.className = 'close';
+	closebtn.addEventListener('click', () => {
+		clearPopup();
+	});
+	popup.appendChild(closebtn);
+	const tab = document.createElement('table');
+	popup.appendChild(tab);
+	(() => {
+		const tr = document.createElement('tr');
+		const thid = document.createElement('th');
+		thid.textContent = 'id';
+		const thimg = document.createElement('th');
+		thimg.textContent = 'image';
+		const thhtml = document.createElement('th');
+		thhtml.textContent = 'html';
+		const thload = document.createElement('th');
+		thload.textContent = 'loaded';
+		tr.appendChild(thimg);
+		tr.appendChild(thid);
+		tr.appendChild(thhtml);
+		tr.appendChild(thload);
+		tab.appendChild(tr);
+	})();
+	sortedkeys.forEach((k) => {
+		const tr = document.createElement('tr');
+		const tdid = document.createElement('td');
+		const spanid = document.createElement('span');
+		spanid.className = 'anchor';
+		spanid.addEventListener('click', () => {
+			const pos = ace1.getCursorPosition();
+			ace1.session.insert(pos, '<img id="' + k + '">');
+		});
+		spanid.textContent = k;
+		tdid.appendChild(spanid);
+		const tdimg = document.createElement('td');
+		const img = document.createElement('img');
+		img.src = tmpdict[k].load ? tmpdict[k].load : '#';
+		tdimg.appendChild(img);
+		const tdhtml = document.createElement('td');
+		tdhtml.textContent = tmpdict[k].html ? '〇' : '　';
+		const tdload = document.createElement('td');
+		tdload.textContent = tmpdict[k].load ? '〇' : '　';
+		tr.appendChild(tdimg);
+		tr.appendChild(tdid);
+		tr.appendChild(tdhtml);
+		tr.appendChild(tdload);
+		tab.appendChild(tr);
+	});
+});
+
 window.api.receive('load-examples', (data) => {
 	// editor.value = examples();
 	ace1.setValue(examples());
@@ -116,6 +229,13 @@ setTimeout(() => {
 	}
 }, 500);
 
+function clearPopup() {
+	popup.classList.add('hidden');
+	popup.childNodes.forEach((el) => {
+		popup.removeChild(el);
+	});
+}
+
 function refleshViewer(txt, reset) {
 	const markedhtml = marked(txt, {
 		toc: false,
@@ -124,6 +244,13 @@ function refleshViewer(txt, reset) {
 
 	const lastScrollTop = viewer.scrollTop;
 	viewer.innerHTML = markedhtml;
+
+	document.querySelectorAll('img').forEach((el) => {
+		if (!el.id) return;
+		if (!loadedimages[el.id]) return;
+
+		el.src = loadedimages[el.id];
+	});
 
 	document.querySelectorAll('pre code.language-tex').forEach((el) => {
 		try {
@@ -216,7 +343,7 @@ function addToast(data) {
 
 	const toast = document.createElement('div');
 	toast.className = 'toast';
-	if (toast.type) toast.classList.add(toast.type);
+	if (data.type) toast.classList.add(data.type);
 	const toastHeader = document.createElement('div');
 	toastHeader.className = 'toast-header';
 	toastHeader.appendChild(document.createTextNode(new Date().toISOString()));

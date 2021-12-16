@@ -65,7 +65,68 @@ body {
 	display: none;
 }
 
-#toast .toast-backdrop {
+#drop {
+	position: fixed;
+	top: 20%;
+	left: 20%;
+	height: 60%;
+	max-height: 60%;
+	width: 60%;
+	border-color: #357;
+	background-color: #fff;
+	overflow-y: auto;
+}
+#drop.hidden {
+	display: none;
+}
+#drop img {
+	max-height: 30%;
+	max-width: 30%;
+}
+#drop .close {
+	cursor: pointer;
+	font-size: 0;
+	border: none;
+	border-radius: 20px;
+	display: inline-block;
+	position: absolute;
+	right: .5rem;
+	top: .5rem;
+	height: 20px;
+	max-height: 20px;
+	width: 20px;
+	max-width: 20px;
+	background-color: rgba(0,0,0,.2);
+}
+#drop .close::before,
+#drop .close::after {
+	background-color: #fff;
+	content: "";
+	display: block;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%) rotate(45deg);
+	transform-origin: center center;
+}
+#drop .close::before {
+	height: 2px;
+	width: 50%;
+}
+#drop .close::after {
+	height: 50%;
+	width: 2px;
+}
+#drop .anchor:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+#drop .close:hover {
+	background-color: rgba(0,0,0,.4);
+}
+
+#toast.toast-backdrop {
 	position: fixed;
 	right: 0;
 	bottom: .5em;
@@ -88,6 +149,10 @@ body {
 	position: relative;
 	top: 5em;
 }
+#toast .toast.warn {
+	background-color: #996;
+	border-color: #996;
+}
 #toast .toast.error {
 	background-color: #966;
 	border-color: #966;
@@ -105,14 +170,17 @@ body {
 }
 
 #editor .ace_scrollbar::-webkit-scrollbar, 
+#drop::-webkit-scrollbar, 
 #viewer::-webkit-scrollbar {
 	width: 20px;
 }
 #editor .ace_scrollbar::-webkit-scrollbar-corner, 
+#drop::-webkit-scrollbar-corner, 
 #viewer::-webkit-scrollbar-corner {
 	background: rgba(255,255,255,.5);
 }
 #editor .ace_scrollbar::-webkit-scrollbar-thumb, 
+#drop::-webkit-scrollbar-thumb, 
 #viewer::-webkit-scrollbar-thumb {
 	background-color: #ccc;
 	border-radius: 6px;
@@ -122,6 +190,7 @@ body {
 	min-height: 32px;
 }
 #editor .ace_scrollbar::-webkit-scrollbar-track, 
+#drop::-webkit-scrollbar-track, 
 #viewer::-webkit-scrollbar-track {
 	background-color: rgba(255,255,255,.5);
 }
@@ -159,10 +228,19 @@ body {
 		border-left: #333 solid 1px;
 	}
 
+	body.dark #drop {
+		background-color: #000;
+	}
+
 	body.dark #toast .toast {
 		background-color: #999;
 		color: #000;
 		border-color: #999;
+	}
+
+	body.dark #toast .toast.warn {
+		background-color: #cc9;
+		border-color: #cc9;
 	}
 
 	body.dark #toast .toast.error {

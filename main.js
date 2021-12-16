@@ -124,6 +124,25 @@ const template = [
       { role: 'undo' },
       { role: 'redo' },
       { type: 'separator' },
+      {
+        label: 'Image',
+        submenu: [
+          {
+            label: 'Add image files',
+            click: addImage
+          },
+          {
+            label: 'Load image files again',
+            click: showImage
+          },
+          { type: 'separator' },
+          {
+            label: 'List images',
+            click: listImage
+          },
+        ]
+      },
+      { type: 'separator' },
       { role: 'cut' },
       { role: 'copy' },
       { role: 'paste' },
@@ -217,6 +236,47 @@ const template = [
 ];
 const menus = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menus);
+
+function addImage() {
+  openImageFile((files) => {
+    mainWindow.webContents.send('load-images', {
+      generateTag: true,
+      files: files
+    });
+  });
+}
+
+function showImage() {
+  openImageFile((files) => {
+    mainWindow.webContents.send('load-images', {
+      files
+    });
+  });
+}
+
+function listImage() {
+  mainWindow.webContents.send('list-images', {});
+}
+
+function openImageFile(callback) {
+  dialog.showOpenDialog({
+    properties: ['openFile', 'multiSelections']
+  }).then((res) => {
+    if (callback) callback(res.filePaths.map((filePath) => {
+      if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) return {};
+
+      const fileContents = fs.readFileSync(filePath);
+      const fileName = path.basename(filePath);
+      // const extName = path.extname(fileName);
+
+      return {
+        path: filePath,
+        name: fileName,
+        contents: fileContents
+      };
+    }));
+  });
+}
 
 function loadExamples() {
   mainWindow.webContents.send('load-examples', {});
