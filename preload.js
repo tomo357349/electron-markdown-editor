@@ -12,6 +12,9 @@ let highlightstyle = null;
 let katexcss = null;
 let katexstyle = null;
 
+let latexcss = null;
+let latexstyle = null;
+
 let config = {};
 (() => {
   let filePath = path.join(process.resourcesPath, 'extra/config.json');
@@ -20,6 +23,7 @@ let config = {};
   }
   highlightcss = path.join(__dirname, config.highlightcss || './node_modules/highlight.js/styles/dark.css');
   katexcss = path.join(__dirname, config.katexcss || './node_modules/katex/dist/katex.css');
+  latexcss = path.join(__dirname, config.latexcss || './node_modules/latex.js/dist/css/base.css');
 })();
 
 let viewcss = null;
@@ -48,8 +52,33 @@ if (fs.existsSync(highlightcss)) {
 
 if (fs.existsSync(katexcss)) {
   katexstyle = '' + fs.readFileSync(katexcss);
+  let pos = -1;
+  while ((pos = katexstyle.indexOf('@font-face', pos)) > -1) {
+    const endpos = katexstyle.indexOf('}', pos);
+    katexstyle = katexstyle.substring(0, pos) + katexstyle.substring(endpos + 1);
+  }
 } else {
   katexcss = null;
+}
+
+if (fs.existsSync(latexcss)) {
+  latexstyle = '' + fs.readFileSync(latexcss);
+  let pos = -1;
+  if ((pos = latexstyle.indexOf('html, .page {')) > -1) {
+    const endpos = latexstyle.indexOf('}', pos);
+    latexstyle = latexstyle.substring(0, pos) + latexstyle.substring(endpos + 1);
+  }
+  if ((pos = latexstyle.indexOf('body, .page {')) > -1) {
+    const endpos = latexstyle.indexOf('}', pos);
+    latexstyle = latexstyle.substring(0, pos) + latexstyle.substring(endpos + 1);
+  }
+  if ((pos = latexstyle.indexOf('h1, h2, h3, h4 {')) > -1) {
+    const endpos = latexstyle.indexOf('}', pos);
+    latexstyle = latexstyle.substring(0, pos) + latexstyle.substring(endpos + 1);
+  }
+  // 
+} else {
+  latexcss = null;
 }
 
 contextBridge.exposeInMainWorld(
@@ -65,6 +94,8 @@ contextBridge.exposeInMainWorld(
     highlightstyle: highlightstyle,
     katexcss: katexcss,
     katexstyle: katexstyle,
+    latexcss: latexcss,
+    latexstyle: latexstyle,
     send: (channel, data) => {
       let validChannels = ['theme-change', 'file-save'];
       if (validChannels.includes(channel)) {

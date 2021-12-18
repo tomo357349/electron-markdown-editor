@@ -184,3 +184,544 @@ img {
 		page-break-before: none;
 	}
 }
+
+:root, :host {
+    --size: 10pt;
+    --line-height: 1.2;
+
+    --paperwidth: 100%;
+
+    --parindent: 1.5em;
+    --parskip: 0px;
+
+    --smallskipamount: 0.3rem;
+    --medskipamount: 0.6rem;
+    --bigskipamount: 1.2rem;
+
+    --listparindent: 0px;
+    --itemindent: 0px;
+
+    --leftmargini: 2.5em;
+    --leftmarginii: 2.2em;
+    --leftmarginiii: 1.87em;
+    --leftmarginiv: 1.7em;
+    --leftmarginv: 1em;
+    --leftmarginvi: 1em;
+
+    --leftmargin: var(--leftmargini);
+
+    --labelsep: 0.5rem;
+
+    --fboxrule: 0.4pt;
+    --fboxsep: 3pt;
+
+    --columnwidth: ;
+
+    --columnsep: 35pt;
+    --columnseprule: 0pt;
+    --columnseprulecolor: black;
+
+    --multicolsep: 12pt;
+}
+.body .twocolumn {
+    --parindent: 1em;
+
+    --marginparsep: 1rem;
+
+    --leftmargini: 2em;
+    --leftmarginv: 0.5em;
+    --leftmarginvi: 0.5em;
+}
+.body .list {
+    --topsep: 0.8rem;
+    --parsep: 0.4rem;
+    --itemsep: 0.4rem;
+    --leftmargin: var(--leftmargini);
+}
+.body .list .list {
+    --topsep: 0.4rem;
+    --parsep: 0.2rem;
+    --itemsep: var(--parsep);
+    --leftmargin: var(--leftmarginii);
+}
+.body .list .list .list {
+    --topsep: 0.2rem;
+    --parsep: 0;
+    --itemsep: var(--topsep);
+    --leftmargin: var(--leftmarginiii);
+}
+.body .list .list .list .list {
+    --topsep: 0;
+    --leftmargin: var(--leftmarginiv);
+}
+.body .list .list .list .list .list {
+    --leftmargin: var(--leftmarginv);
+}
+.body .list .list .list .list .list .list {
+    --leftmargin: var(--leftmarginvi);
+}
+
+.page {
+    display: grid;
+
+    grid-template-columns: [margin-left] var(--marginleftwidth) [body] var(--textwidth) [margin-right] var(--marginrightwidth);
+    grid-template-rows: auto;
+
+    margin: 0;
+    padding: 0;
+
+    max-width: var(--paperwidth);
+    min-width: var(--paperwidth);
+}
+
+.body {
+    grid-column: body;
+    grid-row: 1;
+}
+.body .margin-left {
+    grid-column: margin-left;
+    grid-row: 1;
+    justify-self: end;
+
+    display: flex;
+}
+.body .margin-right {
+    grid-column: margin-right;
+    grid-row: 1;
+    justify-self: start;
+
+    display: flex;
+}
+.body .marginpar {
+    width: var(--marginparwidth);
+    min-width: var(--marginparwidth);
+
+    margin-left: var(--marginparsep);
+    margin-right: var(--marginparsep);
+}
+.body .marginpar > * {
+    padding-bottom: var(--marginparpush);
+}
+.body .onecolumn {
+    column-count: 1;
+}
+.body .twocolumn {
+    column-count: 2;
+}
+.body .multicols {
+    margin-top: var(--multicolsep);
+    margin-bottom: var(--multicolsep);
+
+    column-gap: var(--columnsep);
+    column-rule: var(--columnseprule) solid var(--columnseprulecolor);
+    column-fill: balance;
+}
+.body .span-cols {
+    column-span: all;
+}
+
+.body, .page {
+    hyphens: manual;
+}
+
+.body .rm {
+    font-family: "Computer Modern Serif", serif;
+    font-variant-ligatures: normal;
+}
+.body .sf {
+    font-family: "Computer Modern Sans", sans-serif;
+    font-variant-ligatures: normal;
+}
+.body .tt {
+    font-family: "Computer Modern Typewriter", monospace;
+    font-variant-ligatures: none;
+}
+
+.body .md {
+    font-weight: normal;
+}
+
+.body .bf {
+    font-weight: bold;
+}
+
+.body .up {
+    font-family: "Computer Modern Serif", serif;
+    font-style: normal;
+    font-variant-caps: normal;
+}
+
+.body .it {
+    font-style: italic;
+    font-variant-caps: normal;
+}
+
+.body .sl {
+    font-family: "Computer Modern Serif Slanted";
+    font-style: oblique;
+    font-variant-caps: normal;
+}
+
+.body .sf.sl {
+    font-family: "Computer Modern Sans", sans-serif;
+    font-style: oblique;
+    font-variant-caps: normal;
+}
+
+.body .tt.sl {
+    font-family: "Computer Modern Typewriter Slanted", monospace;
+    font-style: oblique;
+    font-variant-caps: normal;
+}
+
+.body .sc {
+    font-family: "Computer Modern Serif", serif;
+    font-style: normal;
+    font-variant-caps: small-caps;
+}
+
+.body .tiny {
+    font-size: .5rem;
+}
+.body .scriptsize {
+    font-size: .7rem;
+}
+.body .footnotesize {
+    font-size: .82rem;
+}
+.body .small {
+    font-size: .91rem;
+}
+.body .normalsize {
+    font-size: 1rem;
+}
+.body .large {
+    font-size: 1.2rem;
+}
+.body .Large {
+    font-size: 1.4rem;
+}
+.body .LARGE {
+    font-size: 1.7rem;
+}
+.body .huge {
+    font-size: 2rem;
+}
+.body .Huge {
+    font-size: 2.5rem;
+}
+
+.body .titlepage {
+    height: 100vh;
+    min-height: 20rem;
+}
+
+.body .title {
+    font-size: 1.7rem;
+}
+
+.body .author, 
+.body .date {
+    font-size: 1.2rem;
+}
+
+.body .centering, 
+.body .list.center {
+    text-indent: 0;
+    text-align: center;
+}
+.body .raggedright, 
+.body .list.flushleft {
+    text-indent: 0;
+    text-align: left;
+}
+.body .raggedleft, 
+.body .list.flushright {
+    text-indent: 0;
+    text-align: right;
+}
+
+.body .list.center, 
+.body .list.flushleft, 
+.body .list.flushright {
+    margin-left: 0 !important;
+}
+
+.body .list {
+    text-align: justify;
+}
+
+.body .hbox {
+    display: inline-block;
+    white-space: nowrap;
+    text-indent: 0;
+}
+
+.body .phantom {
+    visibility: hidden;
+}
+
+.body .llap {
+    display: inline-flex;
+    flex-direction: column;
+    width: 0;
+    align-items: flex-end;
+}
+
+.body .clap {
+    display: inline-flex;
+    flex-direction: column;
+    width: 0;
+    align-items: center;
+}
+
+.body .rlap {
+    display: inline-block;
+    width: 0;
+}
+
+.body .stretch {
+    display: inline-flex;
+    flex-direction: row;
+
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+.body .smash {
+    display: inline-flex;
+    flex-direction: row;
+    height: 0px;
+    align-items: flex-end;
+}
+
+.body .align-baseline {
+    line-height: 0;
+}
+.body .align-baseline::after {
+    content: '';
+    display: inline-block;
+}
+.body .mpbaseline {
+    line-height: 0;
+    width: 0;
+    height: 0;
+    display: inline-block;
+}
+
+.body .parbox {
+    display: inline-block;
+    text-indent: 0;
+}
+.body .p-t {
+    display: inline-flex;
+}
+.body .p-c {
+    vertical-align: middle;
+}
+.body .p-b {
+    vertical-align: baseline;
+}
+.body .pbh.p-b {
+    vertical-align: text-bottom;
+}
+.body .p-t.p-ct {
+    vertical-align: baseline;
+}
+.body .p-t.p-cc {
+    vertical-align: text-top;
+    align-items: center;
+}
+.body .p-t.p-cb {
+    vertical-align: text-top;
+    display: inline-flex;
+    align-items: flex-end;
+}
+
+.body .p-c.p-cc {
+    display: inline-flex;
+    align-items: center;
+}
+.body .p-c.p-cb {
+    display: inline-flex;
+    align-items: flex-end;
+}
+.body .p-b.p-ct {
+    display: inline-flex;
+    align-items: flex-start;
+}
+.body .p-b.p-cc {
+    display: inline-flex;
+    align-items: center;
+}
+.body .p-b.p-cb {
+    vertical-align: baseline;
+    display: inline-flex;
+    align-items: flex-end;
+}
+.body .p-b.p-cb::before {
+    content: "x";
+    display: inline-block;
+    width: 0;
+    visibility: hidden;
+}
+.body .underline {
+    border-bottom: 0.4pt solid;
+    line-height: 1;
+}
+
+.body .frame {
+    padding: var(--fboxsep);
+    border: var(--fboxrule) solid;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+.body .pframe {
+    border-style: solid;
+}
+.body .picture {
+    display: inline-block;  /* so that it can be given a fixed size */
+    position: relative;
+    vertical-align: bottom; /* needed for \put */
+    text-indent: 0;
+}
+.body .picture-canvas {
+    display: flex;
+    align-items: flex-end;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+.body .put-obj {
+    display: block;
+    position: relative;
+    line-height: 0;
+}
+
+.body .put-obj:after {
+    content: '';
+    display: inline-block;
+}
+.body .strut {
+    display: block;
+}
+.body .picture-object {
+    position: absolute;
+    display: flex;
+}
+
+.body code {
+    white-space: pre;
+}
+.body p, 
+.body ul, 
+.body ol, 
+.body dl, 
+.body div {
+    margin: 0;
+    padding: 0;
+}
+
+.body p {
+    margin-top: var(--parskip);
+    text-indent: var(--parindent);
+}
+
+.body h1 + p, .body h1 + * p:first-child,
+.body h2 + p, .body h2 + * p:first-child,
+.body h3 + p, .body h3 + * p:first-child,
+.body h4 + p, .body h4 + * p:first-child,
+.body .noindent,
+.body .continue {
+    text-indent: 0;
+}
+
+.body .negthinspace {
+    margin-left: -0.16666667em;
+}
+.body .vspace {
+    display: block;
+}
+.body .breakspace {
+    display: table;
+}
+.body .vspace-inline {
+    display: inline-block;
+    height: calc(1em * var(--line-height));     /* full maximum height, including the leading: line-height * font-size */
+    vertical-align: top;                        /* if bottom is used, space could be inserted above this line of text */
+}
+.body .smallskip {
+    margin-bottom: var(--smallskipamount);
+}
+.body .medskip {
+    margin-bottom: var(--medskipamount);
+}
+.body .bigskip {
+    margin-bottom: var(--bigskipamount);
+}
+
+.body .list {
+    margin: calc(var(--topsep) + var(--parskip)) 0;
+    margin-left: var(--leftmargin);
+}
+.body .list p:first-of-type {
+    text-indent: var(--itemindent);
+}
+.body .list p + p {
+    margin-top: var(--parsep);
+    text-indent: var(--listparindent);
+}
+.body .list li + li,
+.body .list dd + dt {
+    margin-top: calc(var(--itemsep) + var(--parsep));
+}
+.body li {
+    list-style: none;
+}
+
+.body .itemlabel + * {
+    display: inline;
+}
+.body .itemlabel > * {
+    position: relative;
+    right: var(--labelsep);
+}
+
+.body dd, 
+.body dd > p:first-child {
+    display: inline;
+}
+.body dd::after {
+    content: "";
+    display: block;
+}
+.body dt {
+    display: inline-block;
+    font-weight: bold;
+}
+.body .list dt {
+    margin-left: calc(-1 * var(--leftmargin));
+}
+.body dd {
+    margin-left: var(--labelsep);
+}
+
+.body .quote, 
+.body .quotation, 
+.body .verse {
+    margin-left: var(--leftmargin);
+    margin-right: var(--leftmargin);
+}
+.body .quotation {
+    --parsep: 0px;
+    --itemindent: 1.5em;
+    --listparindent: var(--itemindent);
+}
+.body .verse {
+    text-align: left;
+
+    margin-left: calc(1.5em + var(--leftmargin));
+    --itemindent: -1.5em;
+    --listparindent: var(--itemindent);
+}
