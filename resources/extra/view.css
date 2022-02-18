@@ -139,6 +139,49 @@ img {
 .d3tree-node.mark text {
 	fill: #600;
 }
+p.note, 
+p.todo, 
+p.warn {
+	border-style: solid;
+	border-width: 3px;
+	padding: .3em;
+}
+.note::first-letter, 
+.todo::first-letter, 
+.warn::first-letter {
+	padding-left: .3em;
+}
+p.note:before, 
+p.todo:before, 
+p.warn:before {
+	display: block;
+	color: #fff;
+	background-color: #ccc;
+}
+p.note {
+	border-color: #ccc;
+	color: #777;
+}
+p.note:before {
+	content: 'NOTE';
+	background-color: #ccc;
+}
+p.todo {
+	border-color: #c66;
+	color: #933;
+}
+p.todo::before {
+	content: 'TODO';
+	background-color: #c66;
+}
+p.warn {
+	border-color: #996;
+	color: #660;
+}
+p.warn::before {
+	content: 'WARN';
+	background-color: #996;
+}
 
 @media screen {
 	.dark {
