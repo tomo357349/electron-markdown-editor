@@ -219,6 +219,19 @@ p.warn::before {
 }
 
 @media print {
+    body {
+        overflow: scroll;
+    }
+    #content {
+        position: static;
+        display: block;
+    }
+    #viewer {
+        display: block;
+    }
+    #editor {
+        display: none;
+    }
 	h1 {
 		margin-top: 0;
 		page-break-before: always;
