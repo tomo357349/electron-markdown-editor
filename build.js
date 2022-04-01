@@ -19,7 +19,7 @@ builder.build({
 			'./node_modules/ace-builds/src-noconflict/theme-github.js',
 			'./node_modules/ace-builds/src-noconflict/theme-one_dark.js',
 			'./node_modules/ace-builds/src-noconflict/theme-monokai.js',
-			'./node_modules/d3/dist/d3.js',
+			'./node_modules/d3/dist/d3.min.js',
 			'./node_modules/highlight.js/package.json',
 			'./node_modules/highlight.js/lib/index.js',
 			'./node_modules/highlight.js/lib/common.js',
@@ -49,6 +49,7 @@ builder.build({
 			'./node_modules/latex.js/dist/js/base.js',
 			'./node_modules/marked/package.json',
 			'./node_modules/marked/lib/marked.cjs',
+			'./node_modules/mermaid/dist/mermaid.min.js',
 		],
 		extraResources: [
 			{

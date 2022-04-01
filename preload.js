@@ -6,7 +6,6 @@ const hljs = require('highlight.js/lib/common');
 const katex = require('katex');
 // const d3 = require('d3');
 
-
 // customize marked.js
 Tokenizer.prototype.paragraph = function (src) {
   const cap = this.rules.block.paragraph.exec(src);
@@ -211,8 +210,6 @@ Renderer.prototype.paragraph = function (text, todo) {
   // customize
   return (todo ? '<p class="' + todo + '">' : '<p>') + text + '</p>\n';
 };
-
-
 
 let highlightcss = null;
 let highlightstyle = null;

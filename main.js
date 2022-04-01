@@ -380,6 +380,11 @@ function printDocument() {
       right: 20
     },
     landscape: false,
+    pagesPerSheet: 1,
+    collate: false,
+    copies: 1,
+    header: '',
+    footer: '',
   });
 }
 

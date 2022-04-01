@@ -15,14 +15,15 @@
   "author": "Tomoaki Takahashi",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^16.0.4",
-    "electron-builder": "^22.14.5"
+    "electron": "^18.0.1",
+    "electron-builder": "^22.14.13"
   },
   "dependencies": {
     "ace-builds": "^1.4.14",
     "d3": "^5.16.0",
-    "highlight.js": "^11.3.1",
-    "katex": "^0.15.2",
+    "highlight.js": "^11.5.0",
+    "mermaid": "8.14.0",
+    "katex": "^0.15.3",
     "latex.js": "^0.12.4",
     "marked": "^4.0.12"
   }
