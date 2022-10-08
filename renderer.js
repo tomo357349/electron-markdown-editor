@@ -339,6 +339,17 @@ function refleshViewer(txt, reset) {
 			});
 		}
 	});
+	document.querySelectorAll('code:not(.hljs)').forEach((el) => {
+		var src = el.innerText;
+		if (src.indexOf('tex$') === 0) {
+			src = src.substring('tex$'.length);
+			el.innerHTML = katex.renderToString(src, {
+				displayMode: false,
+				strict: false,
+				throwOnError: false
+			});
+		}
+	});
 	document.querySelectorAll('pre code.language-katex').forEach((el) => {
 		try {
 			const pre = el.parentElement;
