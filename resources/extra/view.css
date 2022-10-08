@@ -1,7 +1,5 @@
-div, 
-p, 
-td {
-	font-family: "UD デジタル 教科書体 N-R", "游教科書体 横用", "游教科書体", "serif";
+#viewer {
+	font-family: "UD デジタル 教科書体 N-R", "UD Digi Kyokasho N-R", "游教科書体 横用", "游教科書体", "serif";
 	line-height: 1.3;
 }
 h1, 

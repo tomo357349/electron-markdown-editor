@@ -22,8 +22,9 @@ body {
 	display: flex;
 	flex-direction: column;
 
-	font-size: 16px;
-	font-family: 'Ricty Diminished', 'UD デジタル 教科書体 N-R', sans-serif;
+	font-size: 14px;
+	font-family: 'Ricty Diminished', 'UD デジタル 教科書体 N-R', 'UD Digi Kyokasho N-R', sans-serif;
+	/*font-family: Menlo, Monaco, Consolas, "Courier New", monospace;*/
 
 	border: none;
 	padding: .5em;
@@ -36,6 +37,7 @@ body {
 #editor:focus-visible {
 	outline: none;
 }
+
 #editor.flaged {
 	display: none;
 }

@@ -84,7 +84,7 @@ setTimeout(() => {
 	if (!window.api.viewcss) return;
 	var link = document.createElement('link');
 	link.href = window.api.viewcss;
-	console.log(link.href, window.api.viewstyle);
+	// console.log(link.href, window.api.viewstyle);
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
 	document.getElementsByTagName('head')[0].appendChild(link);
