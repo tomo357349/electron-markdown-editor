@@ -7,209 +7,23 @@ const katex = require('katex');
 // const d3 = require('d3');
 
 // customize marked.js
-Tokenizer.prototype.paragraph = function (src) {
-  const cap = this.rules.block.paragraph.exec(src);
-  if (cap) {
-    // customize
-    var todo = cap[1].startsWith('TODO:') ? 'todo' 
-    : cap[1].startsWith('NOTE:') ? 'note'
-    : cap[1].startsWith('WARN:') ? 'warn'
-    : null;
-    if (todo) {
-      cap[1] = cap[1].substring(5);
+const renderer = {
+  heading(text, level, raw) {
+    const id = encodeURI(text);
+    return `<h${level} id="${id}">${text}</h${level}>\n`;
+  },
+  paragraph(text) {
+    let classAttr = '';
+    const match = text.match(/^(TODO|WARN|NOTE):/);
+    console.log(text, match);
+    if (match) {
+      classAttr = ` class="${match[1].toLowerCase()}"`;
+      text = text.substring(5);
     }
-
-    const token = {
-      type: 'paragraph',
-
-      // customize
-      todo: todo,
-
-      raw: cap[0],
-      text: cap[1].charAt(cap[1].length - 1) === '\n'
-        ? cap[1].slice(0, -1)
-        : cap[1],
-      tokens: []
-    };
-    this.lexer.inline(token.text, token.tokens);
-    return token;
+    return `<p${classAttr}>${text}</p>\n`;
   }
-};
-
-Parser.prototype.parse = function (tokens, top = true) {
-  let out = '',
-    i,
-    j,
-    k,
-    l2,
-    l3,
-    row,
-    cell,
-    header,
-    body,
-    token,
-    ordered,
-    start,
-    loose,
-    itemBody,
-    item,
-    checked,
-    task,
-    checkbox,
-    ret;
-
-  const l = tokens.length;
-  for (i = 0; i < l; i++) {
-    token = tokens[i];
-
-    // Run any renderer extensions
-    if (this.options.extensions && this.options.extensions.renderers && this.options.extensions.renderers[token.type]) {
-      ret = this.options.extensions.renderers[token.type].call({ parser: this }, token);
-      if (ret !== false || !['space', 'hr', 'heading', 'code', 'table', 'blockquote', 'list', 'html', 'paragraph', 'text'].includes(token.type)) {
-        out += ret || '';
-        continue;
-      }
-    }
-
-    switch (token.type) {
-      case 'space': {
-        continue;
-      }
-      case 'hr': {
-        out += this.renderer.hr();
-        continue;
-      }
-      case 'heading': {
-        out += this.renderer.heading(
-          this.parseInline(token.tokens),
-          token.depth,
-          unescape(this.parseInline(token.tokens, this.textRenderer)),
-          this.slugger);
-        continue;
-      }
-      case 'code': {
-        out += this.renderer.code(token.text,
-          token.lang,
-          token.escaped);
-        continue;
-      }
-      case 'table': {
-        header = '';
-
-        // header
-        cell = '';
-        l2 = token.header.length;
-        for (j = 0; j < l2; j++) {
-          cell += this.renderer.tablecell(
-            this.parseInline(token.header[j].tokens),
-            { header: true, align: token.align[j] }
-          );
-        }
-        header += this.renderer.tablerow(cell);
-
-        body = '';
-        l2 = token.rows.length;
-        for (j = 0; j < l2; j++) {
-          row = token.rows[j];
-
-          cell = '';
-          l3 = row.length;
-          for (k = 0; k < l3; k++) {
-            cell += this.renderer.tablecell(
-              this.parseInline(row[k].tokens),
-              { header: false, align: token.align[k] }
-            );
-          }
-
-          body += this.renderer.tablerow(cell);
-        }
-        out += this.renderer.table(header, body);
-        continue;
-      }
-      case 'blockquote': {
-        body = this.parse(token.tokens);
-        out += this.renderer.blockquote(body);
-        continue;
-      }
-      case 'list': {
-        ordered = token.ordered;
-        start = token.start;
-        loose = token.loose;
-        l2 = token.items.length;
-
-        body = '';
-        for (j = 0; j < l2; j++) {
-          item = token.items[j];
-          checked = item.checked;
-          task = item.task;
-
-          itemBody = '';
-          if (item.task) {
-            checkbox = this.renderer.checkbox(checked);
-            if (loose) {
-              if (item.tokens.length > 0 && item.tokens[0].type === 'paragraph') {
-                item.tokens[0].text = checkbox + ' ' + item.tokens[0].text;
-                if (item.tokens[0].tokens && item.tokens[0].tokens.length > 0 && item.tokens[0].tokens[0].type === 'text') {
-                  item.tokens[0].tokens[0].text = checkbox + ' ' + item.tokens[0].tokens[0].text;
-                }
-              } else {
-                item.tokens.unshift({
-                  type: 'text',
-                  text: checkbox
-                });
-              }
-            } else {
-              itemBody += checkbox;
-            }
-          }
-
-          itemBody += this.parse(item.tokens, loose);
-          body += this.renderer.listitem(itemBody, task, checked);
-        }
-
-        out += this.renderer.list(body, ordered, start);
-        continue;
-      }
-      case 'html': {
-        // TODO parse inline content if parameter markdown=1
-        out += this.renderer.html(token.text);
-        continue;
-      }
-      case 'paragraph': {
-        // customize
-        out += this.renderer.paragraph(this.parseInline(token.tokens), token.todo);
-
-        continue;
-      }
-      case 'text': {
-        body = token.tokens ? this.parseInline(token.tokens) : token.text;
-        while (i + 1 < l && tokens[i + 1].type === 'text') {
-          token = tokens[++i];
-          body += '\n' + (token.tokens ? this.parseInline(token.tokens) : token.text);
-        }
-        out += top ? this.renderer.paragraph(body) : body;
-        continue;
-      }
-
-      default: {
-        const errMsg = 'Token with "' + token.type + '" type was not found.';
-        if (this.options.silent) {
-          console.error(errMsg);
-          return;
-        } else {
-          throw new Error(errMsg);
-        }
-      }
-    }
-  }
-
-  return out;
-};
-
-Renderer.prototype.paragraph = function (text, todo) {
-  // customize
-  return (todo ? '<p class="' + todo + '">' : '<p>') + text + '</p>\n';
-};
+}
+marked.use({ renderer });
 
 let highlightcss = null;
 let highlightstyle = null;

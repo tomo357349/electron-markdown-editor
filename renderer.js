@@ -293,19 +293,23 @@ function refleshViewer(txt, reset) {
 	viewer.innerHTML = markedhtml;
 
 	document.querySelectorAll('img').forEach((el) => {
-		if (!el.id) return;
-		if (!loadedimages[el.id]) return;
+		if (el.src && loadedimages[strip(el.src)]) el.src = loadedimages[strip(el.src)];
+		if (el.id && loadedimages[el.id]) el.src = loadedimages[el.id];
 
-		el.src = loadedimages[el.id];
+		function strip(url) {
+			const idx = url.lastIndexOf('/');
+			if (idx > -1) return url.substring(idx + 1);
+			return '';
+		}
 	});
 
 	// mermaid.init(undefined, document.querySelectorAll('pre code.language-uml'));
 	document.querySelectorAll('pre code.language-uml').forEach((el, i) => {
 		var pel = el.parentNode;
-		mermaid.mermaidAPI.render('mermaid-dummy-' + i, el.innerText, function (svg, bind) {
-			pel.innerHTML = svg;
-			// bind(pel);
-		}, pel);
+		var api = mermaid;
+		api.render('mermaid-dummy-' + i, el.innerText).then(function (res) {
+			pel.innerHTML = res.svg;
+		});
 	});
 
 	document.querySelectorAll('pre code.language-latex').forEach((el) => {
