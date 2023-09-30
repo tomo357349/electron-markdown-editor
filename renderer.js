@@ -340,7 +340,7 @@ function refleshViewer(txt, reset) {
 		}
 	});
 	document.querySelectorAll('code:not(.hljs)').forEach((el) => {
-		var src = el.innerText;
+		let src = el.innerText;
 		if (src.indexOf('tex$') === 0) {
 			src = src.substring('tex$'.length);
 			el.innerHTML = katex.renderToString(src, {
@@ -606,15 +606,24 @@ function chart(el, opts) {
 		var line = d3.line()
 			.x(function (d) { return x(d[key]); })
 			.y(function (d) { return y(d[value]); });
-		svg.append("path")
-			.datum(data)
-			.attr('class', 'chart-line')
-			.attr("fill", "none")
-			.attr("stroke", "steelblue")
-			.attr("stroke-linejoin", "round")
-			.attr("stroke-linecap", "round")
-			.attr("stroke-width", 1.5)
-			.attr("d", line);
+		var domains = data.reduce(function (p, c) {
+			var d = c.domain || '';
+			if (p.indexOf(d) < 0) p.push(d);
+			return p;
+		}, []);
+		domains.forEach(function (domain, i) {
+			svg.append("path")
+				.datum(data.filter(function (d) {
+					return domain === (d.domain || '');
+				}))
+				.attr('class', 'chart-line')
+				.attr("fill", "none")
+				.attr("stroke", d3.schemeTableau10[i % 10])
+				.attr("stroke-linejoin", "round")
+				.attr("stroke-linecap", "round")
+				.attr("stroke-width", 1.5)
+				.attr("d", line);
+		});
 	}
 
 	// add the x Axis
