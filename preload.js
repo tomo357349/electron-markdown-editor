@@ -22,8 +22,52 @@ const renderer = {
     }
     return `<p${classAttr}>${text}</p>\n`;
   }
+};
+// https://www.marked.js.org/using_pro
+const descriptionList = {
+  name: 'descriptionList',
+  level: 'block',
+  start(src) { return src.match(/:[^:\n]/)?.index; },
+  tokenizer(src, tokens) {
+    const rule = /^(?::[^:\n]+:[^:\n]*(?:\n|$))+/;
+    const match = rule.exec(src);
+    if (match) {
+      const token = {
+        type: 'descriptionList',
+        raw: match[0],
+        text: match[0].trim(),
+        tokens: []
+      };
+      this.lexer.inline(token.text, token.tokens);
+      return token;
+    }
+  },
+  renderer(token) {
+    return `<dl>${this.parser.parseInline(token.tokens)}\n</dl>`;
+  }
+};
+const description = {
+  name: 'description',
+  level: 'inline',
+  start(src) { return src.match(/:/)?.index; },
+  tokenizer(src, tokens) {
+    const rule = /^:([^:\n]+):([^:\n]*)(?:\n|$)/;
+    const match = rule.exec(src);
+    if (match) {
+      return {
+        type: 'description',
+        raw: match[0],
+        dt: this.lexer.inlineTokens(match[1].trim()),
+        dd: this.lexer.inlineTokens(match[2].trim())
+      };
+    }
+  },
+  renderer(token) {
+    return `\n<dt>${this.parser.parseInline(token.dt)}</dt><dd>${this.parser.parseInline(token.dd)}`;
+  },
+  childTokens: ['dt', 'dd'],
 }
-marked.use({ renderer });
+marked.use({ renderer, extensions: [descriptionList, description] });
 
 let highlightcss = null;
 let highlightstyle = null;
