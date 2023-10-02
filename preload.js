@@ -27,7 +27,7 @@ const renderer = {
 const descriptionList = {
   name: 'descriptionList',
   level: 'block',
-  start(src) { return src.match(/:[^:\n]/)?.index; },
+  start(src) { return src.match(/^:[^:\n]/)?.index; },
   tokenizer(src, tokens) {
     const rule = /^(?::[^:\n]+:[^:\n]*(?:\n|$))+/;
     const match = rule.exec(src);
