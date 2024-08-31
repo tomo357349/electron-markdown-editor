@@ -8,14 +8,16 @@ const katex = require('katex');
 
 // customize marked.js
 const renderer = {
-  heading(text, level, raw) {
+  heading(token) {
+    const text = this.parser.parseInline(token.tokens);
+    const level = token.depth;
     const id = encodeURI(text);
     return `<h${level} id="${id}">${text}</h${level}>\n`;
   },
-  paragraph(text) {
+  paragraph(token) {
+    let text = token.text;
     let classAttr = '';
     const match = text.match(/^(TODO|WARN|NOTE):/);
-    console.log(text, match);
     if (match) {
       classAttr = ` class="${match[1].toLowerCase()}"`;
       text = text.substring(5);

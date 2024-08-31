@@ -15,16 +15,16 @@
   "author": "Tomoaki Takahashi",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^26.2.4",
-    "electron-builder": "^24.6.4"
+    "electron": "^32.0.1",
+    "electron-builder": "^24.13.3"
   },
   "dependencies": {
-    "ace-builds": "^1.28.0",
+    "ace-builds": "^1.36.2",
     "d3": "^7.8.5",
-    "highlight.js": "^11.8.0",
-    "katex": "^0.16.8",
+    "highlight.js": "^11.10.0",
+    "katex": "^0.16.11",
     "latex.js": "^0.12.6",
-    "marked": "^9.0.3",
-    "mermaid": "^10.4.0"
+    "marked": "^14.1.0",
+    "mermaid": "^11.0.2"
   }
 }
