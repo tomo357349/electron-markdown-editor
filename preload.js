@@ -69,7 +69,46 @@ const description = {
   },
   childTokens: ['dt', 'dd'],
 }
-marked.use({ renderer, extensions: [descriptionList, description] });
+const footprintList = {
+  name: 'footprintList',
+  level: 'block',
+  start(src) { return src.match(/\[/)?.index; },
+  tokenizer(src, tokens) {
+    const rule = /^\[\^([0-9-]+)\]:(.+)(?:\n|$)/;
+    const match = rule.exec(src);
+    if (match) {
+      return {
+        type: 'footprintList',
+        raw: match[0],
+        num: match[1],
+        text: this.lexer.inlineTokens(match[2].trim()),
+      };
+    }
+  },
+  renderer(token) {
+    return `<div class="footprint"><a href="#fp-${token.num}" name="fp-d-${token.num}">*${token.num}</a>. ${this.parser.parseInline(token.text)}</div>`;
+  },
+};
+const footprint = {
+  name: 'footprint',
+  level: 'inline',
+  start(src) { return src.match(/\[/)?.index; },
+  tokenizer(src, tokens) {
+    const rule = /^\[\^([0-9-]+)\](?!:)/;
+    const match = rule.exec(src);
+    if (match) {
+      return {
+        type: 'footprint',
+        raw: match[0],
+        num: match[1],
+      };
+    }
+  },
+  renderer(token) {
+    return `<sup><a href="#fp-d-${token.num}" name="fp-${token.num}">*${token.num}</></sup>`;
+  },
+};
+marked.use({ renderer, extensions: [footprint, footprintList, descriptionList, description] });
 
 let highlightcss = null;
 let highlightstyle = null;
